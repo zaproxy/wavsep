@@ -493,7 +493,7 @@
 						URL url = new URL(targetFile);
 						try {
 							file = new File(url.toURI());
-						} catch (URISyntaxException e) {
+						} catch (Exception e) {
 							file = new File(url.getPath());
 						}
 						is = new FileInputStream(file);
