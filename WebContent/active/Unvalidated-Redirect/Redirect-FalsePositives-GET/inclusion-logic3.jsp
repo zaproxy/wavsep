@@ -2,6 +2,7 @@
 <%@page import="com.sectooladdict.enums.VulnerabilityType"%>
 <%@page import="com.sectooladdict.constants.FileConstants"%>
 <%@page import="com.sectooladdict.validators.InputValidator"%>
+<%@ page import="javax.management.ObjectName,javax.management.MBeanServer,java.lang.management.ManagementFactory,java.util.Set" %>
 
     <%
         //First set the prefix according to the path type
@@ -282,9 +283,24 @@
                     	}
                     					
                     	if (defaultInputType == DefaultInputType.RELATIVE_INPUT) {
+                            // This had previously been using request.getServerName().
+                            // However, that actually means that it 'trusts' the Host
+                            // header from the traffic, which turns this test which was
+                            // meant to be a FP case into a TP case for scenarios when
+                            // headers are being manipulated by a scanner.
+                            // There should only be one configured (default is localhost)
+                            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                            ObjectName engineObj = new ObjectName("Catalina:type=Engine,*");
+                            Set<ObjectName> engines = mbs.queryNames(engineObj, null);
+                            String defaultHost = "";
+                            if (!engines.isEmpty()) {
+                                ObjectName engine = engines.iterator().next();
+                                defaultHost = (String) mbs.getAttribute(engine, "defaultHost");
+                            }
+
                     		//relative to current dir path
                     		defaultBasePath = FileConstants.HTTP_PREFIX
-                           		+ request.getServerName() + ":" +
+                           		+ defaultHost + ":" +
                     			request.getServerPort() + request.getContextPath() + 
                     			contextRelativeDirPath + "/";
                     		targetFile = defaultBasePath + targetFile;
