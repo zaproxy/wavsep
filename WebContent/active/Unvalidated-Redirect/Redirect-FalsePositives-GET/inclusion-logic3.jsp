@@ -2,6 +2,7 @@
 <%@page import="com.sectooladdict.enums.VulnerabilityType"%>
 <%@page import="com.sectooladdict.constants.FileConstants"%>
 <%@page import="com.sectooladdict.validators.InputValidator"%>
+<%@ page import="javax.management.ObjectName,javax.management.MBeanServer,java.lang.management.ManagementFactory,java.util.Set" %>
 
 
 	<%
@@ -284,8 +285,15 @@
 										
 						if (defaultInputType == DefaultInputType.RELATIVE_INPUT) {
 							//relative to current dir path
+							MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+							Set<ObjectName> hosts = mbs.queryNames(
+								new ObjectName("Catalina:type=Host,*"), null);
+							// There should only be one configured (default is localhost)
+							String firstHostName = (String) mbs.getAttribute(hosts.get(0), "name");
+
 							defaultBasePath = FileConstants.HTTP_PREFIX
-					       		+ request.getServerName() + ":" +
+							+ firstHostName + ":" +
+								//+ request.getServerName() + ":" +
 								request.getServerPort() + request.getContextPath() + 
 								contextRelativeDirPath + "/";
 							targetFile = defaultBasePath + targetFile;
