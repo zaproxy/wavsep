@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Main JSP to use leading spaces instead of a mix of spaces and tabs - to make refactoring easier. 
+- Unvalidated-Redirect/Redirect-FalsePositives-GET/Case09... now uses the first configured host name (identified via JMX) instead of the requested host name (which could have been from a manipulated Host header).
 
 ### Fixed
 - Changed all of the SQL JSPs to use try-with-resources on the db statement.
