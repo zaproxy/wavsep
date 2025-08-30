@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 2025-08-30
+- Imported OS Command Injection tests from Reinforced Wavsep.
+
 ## 2025-08-28
 
 ### Changed

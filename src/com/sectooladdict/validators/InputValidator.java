@@ -264,8 +264,31 @@ public final class InputValidator {
     	//intentionally ignore upper/lower case issues, so evasion can be used
     	return s.replace("http://", "");
     } //end of method
-    
-    
+
+    public static boolean validatePipe(String s) {
+        if (s.contains("|"))
+            return true;
+        return false;
+    }
+
+    public static String removePipe(String s) {
+        String temp = null;
+        temp = s.replace("|", "");
+        return temp;
+    }
+
+    public static boolean validateAmpersand(String s) {
+        if (s.contains("&"))
+            return true;
+        return false;
+    }
+
+    public static String removeAmpersand(String s) {
+        String temp = null;
+        temp = s.replace("&", "");
+        return temp;
+    }
+
     /**
      * This method attempts to remove instances of 
      * Unix local directory traversal characters (/./,./) from the input.

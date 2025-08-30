@@ -36,5 +36,13 @@ public enum FileAccessRestriction {
 	/*#######################################*/	
 	HTTP_INPUT_VALIDATION, //Input Validation (http)
 	HTTP_INPUT_REMOVAL, //Input Removal (http)
-    CONCAT_DOMAIN_BASE_URL; //Concats the domain base URL to the input
+    CONCAT_DOMAIN_BASE_URL, //Concats the domain base URL to the input
+	/*###############################*/
+	/*## OS COMMAND INJECTION ONLY ##*/
+	/*###############################*/	
+	PIPE_INPUT_VALIDATION,
+	PIPE_INPUT_REMOVAL,
+	AMPERSAND_INPUT_VALIDATION,
+	AMPERSAND_INPUT_REMOVAL
+
 }

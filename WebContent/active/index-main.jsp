@@ -16,6 +16,7 @@ Pages in this section should only contain vulnerabilities detectable by passive 
 <LI><A HREF="index-rfi.jsp">Remote File Inclusion</A>
 <LI><A HREF="index-redirect.jsp">Unvalidated Redirect</A>
 <LI><A HREF="index-false.jsp">False Positive Test Cases</A>
+<LI><A HREF="index-os-command.jsp">OS Command Injection Test Cases</A>
 </UL>
 
 </body>

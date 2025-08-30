@@ -10,5 +10,5 @@ package com.sectooladdict.enums;
  * @since 1.2
  */
 public enum OsType {
-	WINDOWS, UNIX;
+	WINDOWS, UNIX, ANY;
 }
