@@ -19,6 +19,8 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: Check formatting
+      run: mvn spotless:check
     - name: Build with Maven
       run: mvn clean package
 

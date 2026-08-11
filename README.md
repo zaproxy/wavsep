@@ -27,6 +27,13 @@ To build and run WAVSEP run the following commands:
 
 WAVSEP will then be accessible via [http://localhost:8080/wavsep/](http://localhost:8080/wavsep/)
 
+## Formatting
+
+WAVSEP uses [Spotless](https://github.com/diffplug/spotless) with Google Java Format (AOSP), matching ZAP core and zap-extensions. Spotless needs JRE 17+ (same as CI).
+
+* Apply formatting: `mvn spotless:apply`
+* Check formatting: `mvn spotless:check`
+
 ## Debugging
 
 To show the output of WAVSEP run it using the command:

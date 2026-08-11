@@ -1,99 +1,84 @@
-/**
- * 
- */
+/** */
 package com.sectooladdict.database;
 
+// connection pool management implementation
+import com.sectooladdict.constants.DatabaseConstants;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-//connection pool management implementation
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDriver;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.PoolingDriver;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-
-import com.sectooladdict.constants.DatabaseConstants;
 
 /**
- * The ConnectionPoolManager class uses the external package
- * DBCP 1.4.x (Apache) for managing connection pools.
+ * The ConnectionPoolManager class uses the external package DBCP 1.4.x (Apache) for managing
+ * connection pools.
  *
  * @author Shay Chen
  * @since 1.0.2
  */
 public final class ConnectionPoolManager {
 
-	//*****************
-    //* Derby Methods *
-    //*****************
-	
-	public static Connection getDerbyConnection() throws Exception{
-		Connection conn = null;
-		try {
-			Class.forName(DatabaseConstants.DERBY_DATABASE_DRIVER);
-			conn = DriverManager.getConnection(DatabaseConstants.DERBY_CONNECTION_STRING);
-		} catch (SQLException e) {
-			//invalid connection string, database is down or driver not loaded
-			try {
-				//Create new driver instance
-				Class.forName(DatabaseConstants.DERBY_DATABASE_DRIVER).newInstance();
-				conn = DriverManager.getConnection(DatabaseConstants.DERBY_CONNECTION_STRING);
-			} catch (Exception e2) {
-				throw e2;
-			}
-		} catch (Exception e) {
-			throw e;
-		} //end of try-catch block
-		
-		return conn; 
-	}
-	
-	
-    //**********
-    //* Fields *
-    //**********
-    /**
-     * A local counter meant to track the amount of exceptions in
-     * the closeConnection method.
-     */
+    // *****************
+    // * Derby Methods *
+    // *****************
+
+    public static Connection getDerbyConnection() throws Exception {
+        Connection conn = null;
+        try {
+            Class.forName(DatabaseConstants.DERBY_DATABASE_DRIVER);
+            conn = DriverManager.getConnection(DatabaseConstants.DERBY_CONNECTION_STRING);
+        } catch (SQLException e) {
+            // invalid connection string, database is down or driver not loaded
+            try {
+                // Create new driver instance
+                Class.forName(DatabaseConstants.DERBY_DATABASE_DRIVER).newInstance();
+                conn = DriverManager.getConnection(DatabaseConstants.DERBY_CONNECTION_STRING);
+            } catch (Exception e2) {
+                throw e2;
+            }
+        } catch (Exception e) {
+            throw e;
+        } // end of try-catch block
+
+        return conn;
+    }
+
+    // **********
+    // * Fields *
+    // **********
+    /** A local counter meant to track the amount of exceptions in the closeConnection method. */
     private static long closeConnectionExceptionCounter = 0;
-    /**
-     * A flag for storing the pool initialization state.
-     */
+
+    /** A flag for storing the pool initialization state. */
     private static boolean isInitialized = false;
 
-    
-    //****************
-    //* Constructors *
-    //****************
+    // ****************
+    // * Constructors *
+    // ****************
     /**
-     * The default constructor is disabled to prevent programmers
-     * from using it to create class instances.
+     * The default constructor is disabled to prevent programmers from using it to create class
+     * instances.
      *
      * @throws Exception Default constructor not supported.
      * @since 1.0.2
      */
     @SuppressWarnings("unused")
     private ConnectionPoolManager() throws Exception {
-        throw new Exception("Default constructor is not supported in "
-                + this.getClass());
-    } //end of constructor
+        throw new Exception("Default constructor is not supported in " + this.getClass());
+    } // end of constructor
 
-    
     /**
-     * Initializes a common shared connection pool instance, 
-     * by using a synchronized creation method to prevent
-     * the creation of multiple instances in case the method is
-     * simultaneously executed by multiple threads.
+     * Initializes a common shared connection pool instance, by using a synchronized creation method
+     * to prevent the creation of multiple instances in case the method is simultaneously executed
+     * by multiple threads.
      *
-     * Potential Problems:
-     * (1) Database may not be accessible (down, firewall, network, etc).
-     * (2) Improper database permissions.
-     * (3) lack of storage resources.
+     * <p>Potential Problems: (1) Database may not be accessible (down, firewall, network, etc). (2)
+     * Improper database permissions. (3) lack of storage resources.
      *
      * @throws java.lang.Exception Failed to create DatabaseLogWriter instance.
      * @since 1.0
@@ -104,107 +89,97 @@ public final class ConnectionPoolManager {
                 createNewInstance();
             }
         } catch (Exception e) {
-            String exceptionDescripton = "Critical exception occurred in the "
-                + "ConnectionPoolManager getInstance method: " + e.toString();
+            String exceptionDescripton =
+                    "Critical exception occurred in the "
+                            + "ConnectionPoolManager getInstance method: "
+                            + e.toString();
             System.out.println(exceptionDescripton);
             throw new Exception(exceptionDescripton);
-        } //end of try-catch block
-
-    } //end of method
-
+        } // end of try-catch block
+    } // end of method
 
     /**
-     * Initializes a common shared connection pool instance. 
-     * The method is synchronized to prevent
-     * the creation of multiple instances in case the method is
-     * simultaneously executed by multiple threads.
-     * In the current implementation, if multiple threads will invoke the method
-     * simultaneously, then a new instance will be generated by the first thread
-     * and the rest will skip the "if" check, and get the existing instance.
+     * Initializes a common shared connection pool instance. The method is synchronized to prevent
+     * the creation of multiple instances in case the method is simultaneously executed by multiple
+     * threads. In the current implementation, if multiple threads will invoke the method
+     * simultaneously, then a new instance will be generated by the first thread and the rest will
+     * skip the "if" check, and get the existing instance.
      *
-     * Potential Problems:
-     * (1) Database may not be accessible (down, firewall, network, etc).
-     * (2) Improper database permissions.
-     * (3) lack of storage resources.
+     * <p>Potential Problems: (1) Database may not be accessible (down, firewall, network, etc). (2)
+     * Improper database permissions. (3) lack of storage resources.
      *
      * @throws java.lang.Exception Failed to create instance.
      * @since 1.0
      */
     private static synchronized void createNewInstance() throws Exception {
         try {
-            if (isInitialized == false) {	
-            	//initialize database access configuration (stored in derby DB)
-            	loadDatabaseInfo();
-            	//initialize connection pool
-            	initializePool();
-            	isInitialized = true;       	
+            if (isInitialized == false) {
+                // initialize database access configuration (stored in derby DB)
+                loadDatabaseInfo();
+                // initialize connection pool
+                initializePool();
+                isInitialized = true;
             }
         } catch (Exception e) {
-            String exceptionDescripton = "Critical exception occurred in the"
-                + " ConnectionPoolManager createNewInstance method: "
-                + e.toString();
+            String exceptionDescripton =
+                    "Critical exception occurred in the"
+                            + " ConnectionPoolManager createNewInstance method: "
+                            + e.toString();
             System.out.println(exceptionDescripton);
             throw new Exception(exceptionDescripton);
-        } //end of try-catch block
+        } // end of try-catch block
+    } // end of method
 
-    } //end of method
+    // ***********
+    // * Methods *
+    // ***********
 
-    
-    //***********
-    //* Methods *
-    //***********
-    
-    /**
-     * 
-     */
+    /** */
     public static void loadDatabaseInfo() {
-    	try {
-    		java.sql.Connection conn = ConnectionPoolManager.getDerbyConnection();
-			
-    		String sqlString = 
-		          "SELECT host,port,wavsep_username,wavsep_password " +
-		          "FROM mysqlconfiguration " +
-		          "WHERE id=?";
-			java.sql.PreparedStatement pstmt = conn.prepareStatement(sqlString);
-			pstmt.setInt(1,DatabaseConstants.DERBY_DATABASE_CONFIGURATION_ID);
-			
-			ResultSet rs = pstmt.executeQuery();
-		 	
-		 	if(rs.next()) {
-		 		DatabaseConstants.CONNECTION_STRING_WITHOUT_CREDENTIALS =
-		 	        "jdbc:mysql://" + rs.getString(1) + ":" +
-		 	        rs.getString(2) + "/wavsepDB";
-		 		DatabaseConstants.USERNAME = rs.getString(3);
-		 		DatabaseConstants.PASSWORD = rs.getString(4);
-		 		
-	 	    } else {
-	 	 		throw new Exception("database configuration was not initialized!\n");
-	 	 	}
-		} catch (Exception e) {
-			//database configuration was not initialized
-			System.out.println("config db initialization error: "+e);
-		}
-    }//end of method
-    
+        try {
+            java.sql.Connection conn = ConnectionPoolManager.getDerbyConnection();
+
+            String sqlString =
+                    "SELECT host,port,wavsep_username,wavsep_password "
+                            + "FROM mysqlconfiguration "
+                            + "WHERE id=?";
+            java.sql.PreparedStatement pstmt = conn.prepareStatement(sqlString);
+            pstmt.setInt(1, DatabaseConstants.DERBY_DATABASE_CONFIGURATION_ID);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                DatabaseConstants.CONNECTION_STRING_WITHOUT_CREDENTIALS =
+                        "jdbc:mysql://" + rs.getString(1) + ":" + rs.getString(2) + "/wavsepDB";
+                DatabaseConstants.USERNAME = rs.getString(3);
+                DatabaseConstants.PASSWORD = rs.getString(4);
+
+            } else {
+                throw new Exception("database configuration was not initialized!\n");
+            }
+        } catch (Exception e) {
+            // database configuration was not initialized
+            System.out.println("config db initialization error: " + e);
+        }
+    } // end of method
+
     /**
-     * Creates and initializes a new DBCP connection pool by manually
-     * registering it with a PoolingDriver and associating it with the
-     * alias defined in the database constants class.
+     * Creates and initializes a new DBCP connection pool by manually registering it with a
+     * PoolingDriver and associating it with the alias defined in the database constants class.
      *
      * @throws Exception Database support or access related error.
      * @since 1.0
      */
     private static void initializePool() throws Exception {
 
-    	//load the database driver
+        // load the database driver
         Class.forName(DatabaseConstants.DATABASE_DRIVER);
-    	
+
         GenericObjectPool connectionPool = null;
 
-        //Code-level configuration is mainly used for testing
-        GenericObjectPool.Config poolConfig =
-            new GenericObjectPool.Config();
-        poolConfig.lifo = true; //last idle connection -> first borrowed
+        // Code-level configuration is mainly used for testing
+        GenericObjectPool.Config poolConfig = new GenericObjectPool.Config();
+        poolConfig.lifo = true; // last idle connection -> first borrowed
         poolConfig.maxActive = 15;
         poolConfig.maxIdle = 15;
         poolConfig.maxWait = 60000;
@@ -220,28 +195,26 @@ public final class ConnectionPoolManager {
 
         connectionPool = new GenericObjectPool(null, poolConfig);
 
-        //A connection string without authentication is used for the connection
-        //factory creation, since the DriverManagerConnectionFactory
-        //integrates credentials separately.
-        ConnectionFactory connFactory = new DriverManagerConnectionFactory(
-        		DatabaseConstants.CONNECTION_STRING_WITHOUT_CREDENTIALS,
-        		DatabaseConstants.USERNAME, DatabaseConstants.PASSWORD);
+        // A connection string without authentication is used for the connection
+        // factory creation, since the DriverManagerConnectionFactory
+        // integrates credentials separately.
+        ConnectionFactory connFactory =
+                new DriverManagerConnectionFactory(
+                        DatabaseConstants.CONNECTION_STRING_WITHOUT_CREDENTIALS,
+                        DatabaseConstants.USERNAME,
+                        DatabaseConstants.PASSWORD);
 
         PoolableConnectionFactory poolableConnectionFactory =
-            new PoolableConnectionFactory(
-                connFactory, connectionPool, null, null, false, true);
+                new PoolableConnectionFactory(connFactory, connectionPool, null, null, false, true);
 
-        //load the pool driver
+        // load the pool driver
         Class.forName("org.apache.commons.dbcp.PoolingDriver");
 
         PoolingDriver poolDriver = new PoolingDriver();
 
-        //set the pool name
-        poolDriver.registerPool(DatabaseConstants.CONNECTION_POOL_NAME, 
-        		                connectionPool);
-
-    } //end of method
-
+        // set the pool name
+        poolDriver.registerPool(DatabaseConstants.CONNECTION_POOL_NAME, connectionPool);
+    } // end of method
 
     /**
      * Creates and returns a connection to the database.
@@ -251,14 +224,13 @@ public final class ConnectionPoolManager {
      * @since 1.0
      */
     public static Connection getConnection() throws java.lang.Exception {
-    	if (isInitialized == false) {
-    		initialize();
-    		isInitialized = true;
-    	}
-        return DriverManager.getConnection("jdbc:apache:commons:dbcp:"
-            + DatabaseConstants.CONNECTION_POOL_NAME);
-    }  //end of method
-
+        if (isInitialized == false) {
+            initialize();
+            isInitialized = true;
+        }
+        return DriverManager.getConnection(
+                "jdbc:apache:commons:dbcp:" + DatabaseConstants.CONNECTION_POOL_NAME);
+    } // end of method
 
     /**
      * Returns an active connection to the pool.
@@ -273,9 +245,8 @@ public final class ConnectionPoolManager {
             }
         } catch (Exception e) {
             closeConnectionExceptionCounter++;
-        } //end of try-catch block
-    }  //end of method
-
+        } // end of try-catch block
+    } // end of method
 
     /**
      * Disposes of the connections in the pool.
@@ -284,26 +255,21 @@ public final class ConnectionPoolManager {
      * @since 1.0
      */
     public static void dispose() throws SQLException {
-        PoolingDriver driver =
-            (PoolingDriver) DriverManager.getDriver(
-                "jdbc:apache:commons:dbcp:");
+        PoolingDriver driver = (PoolingDriver) DriverManager.getDriver("jdbc:apache:commons:dbcp:");
         driver.closePool(DatabaseConstants.CONNECTION_POOL_NAME);
         closeConnectionExceptionCounter = 0;
-    } //end of method
-
+    } // end of method
 
     /**
-     * Returns the number of of connection closing failures, since
-     * the last pool connection disposal.
-     * Used for maintenance purposes.
+     * Returns the number of of connection closing failures, since the last pool connection
+     * disposal. Used for maintenance purposes.
      *
      * @return The number of exceptions that occurred when closing connections.
      * @since 1.0
      */
     public static long getCloseConnectionExceptionCounter() {
         return closeConnectionExceptionCounter;
-    } //end of method
-
+    } // end of method
 
     /**
      * Returns the number of of active connections.
@@ -313,14 +279,11 @@ public final class ConnectionPoolManager {
      * @since 1.0
      */
     public static long getActiveConnectionCounter() throws Exception {
-        PoolingDriver driver =
-            (PoolingDriver) DriverManager.getDriver(
-                "jdbc:apache:commons:dbcp:");
-        ObjectPool connectionPool = 
-        	driver.getConnectionPool(DatabaseConstants.CONNECTION_POOL_NAME);
+        PoolingDriver driver = (PoolingDriver) DriverManager.getDriver("jdbc:apache:commons:dbcp:");
+        ObjectPool connectionPool =
+                driver.getConnectionPool(DatabaseConstants.CONNECTION_POOL_NAME);
         return connectionPool.getNumActive();
-    } //end of method
-
+    } // end of method
 
     /**
      * Returns the number of of idle connections.
@@ -330,16 +293,9 @@ public final class ConnectionPoolManager {
      * @since 1.0
      */
     public static long getIdleConnectionCounter() throws Exception {
-        PoolingDriver driver =
-            (PoolingDriver) DriverManager.getDriver(
-                "jdbc:apache:commons:dbcp:");
-        ObjectPool connectionPool = 
-        	driver.getConnectionPool(DatabaseConstants.CONNECTION_POOL_NAME);
+        PoolingDriver driver = (PoolingDriver) DriverManager.getDriver("jdbc:apache:commons:dbcp:");
+        ObjectPool connectionPool =
+                driver.getConnectionPool(DatabaseConstants.CONNECTION_POOL_NAME);
         return connectionPool.getNumIdle();
-    } //end of method
-
-
-} //end of class
-
-
-   
+    } // end of method
+} // end of class

@@ -1,6 +1,4 @@
-/**
- * 
- */
+/** */
 package com.sectooladdict.enums;
 
 /**
@@ -8,16 +6,16 @@ package com.sectooladdict.enums;
  *
  * @author Shay Chen
  * @since 1.2
- * */
+ */
 public enum PathType {
-	/*##############*/
-	/*## LFI ONLY ##*/
-	/*##############*/
-	OS_PATH, //current os file path
-	FILE_DIRECTIVE_URL, //"file:/" or "file://"
-	/*##############*/
-	/*## RFI ONLY ##*/
-	/*##############*/
-	FTP_URL, //"ftp:/" or "ftp://"
-	HTTP_URL, //"http://" or "https://"
+    /*##############*/
+    /*## LFI ONLY ##*/
+    /*##############*/
+    OS_PATH, // current os file path
+    FILE_DIRECTIVE_URL, // "file:/" or "file://"
+    /*##############*/
+    /*## RFI ONLY ##*/
+    /*##############*/
+    FTP_URL, // "ftp:/" or "ftp://"
+    HTTP_URL, // "http://" or "https://"
 }
