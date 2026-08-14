@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
 <!--
-	Inspired by a vulnerable test case originally written for the OWASP Zed Attack Proxy (ZAP) project
-	(http://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project) 
+	Inspired by a vulnerable test case originally written for the Zed Attack Proxy (ZAP) project
+	(https://www.zaproxy.org) 
 	Original Author: psiinon (psiinon@gmail.com).
 -->
 <head>
@@ -11,7 +11,7 @@
 
 <H2>Session vulnerabilities</H2>
 <br>
-(Contributed by the <b>OWASP Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
+(Contributed by the <b>Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
 <br>
 <H3>Examples</H3>
 <UL>

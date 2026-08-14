@@ -20,7 +20,7 @@
 <font size="5">Test Cases:</font><br><br>
 <B><a href="Case01-Tag2HtmlPageScope-StripScriptTag.jsp">Case01-Tag2HtmlPageScope-StripScriptTag.jsp</a></B><br>
   Injection of tags to the scope of the HTML page that strips script tags.<br>
-  (Contributed by the <b>OWASP Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
+  (Contributed by the <b>Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
   <U>Barriers:</U><br>
   Script tags are stripped from the input<br>
   <U>Sample Exploit Structures:</U><br>
@@ -33,7 +33,7 @@
   
 <B><a href="Case02-Tag2HtmlPageScope-SecretVectorGET.jsp">Case02-Tag2HtmlPageScope-SecretVectorGET.jsp</a></B><br>
   Injection of tags to the scope of the HTML page that that only relies on secret GET input.<br>
-  (Contributed by the <b>OWASP Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
+  (Contributed by the <b>Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
   <U>Barriers:</U><br>
   Secret input vector without any hints<br>
   <U>Sample Exploit Structures:</U><br>
@@ -48,7 +48,7 @@
   
 <B><a href="Case03-Tag2HtmlPageScope-ConstantAntiCSRFToken.jsp">Case03-Tag2HtmlPageScope-ConstantAntiCSRFToken.jsp</a></B><br>
   Injection of tags to the scope of the HTML page that requires a constant session stored AntiCSRF token.<br>
-  (Contributed by the <b>OWASP Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
+  (Contributed by the <b>Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
   <U>Barriers:</U><br>
   Requires a constant session-specific AntiCSRF token<br>
   <U>Sample Exploit Structures (alongside the AntiCSRF token):</U><br>
@@ -63,7 +63,7 @@
   
 <B><a href="Case04-Tag2HtmlPageScope-ChangingAntiCSRFToken.jsp">Case04-Tag2HtmlPageScope-ChangingAntiCSRFToken.jsp</a></B><br>
   Injection of tags to the scope of the HTML page that requires an expiring one-use session stored AntiCSRF token.<br>
-  (Contributed by the <b>OWASP Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
+  (Contributed by the <b>Zed Attack Proxy (ZAP) project</b>, via Simon Bennetts)<br>
   <U>Barriers:</U><br>
   Requires a changing, newly generated session-specific AntiCSRF token<br>
   <U>Sample Exploit Structures (alongside the AntiCSRF token):</U><br>
